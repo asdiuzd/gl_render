@@ -1,0 +1,16 @@
+.DS_Store
+lib/
+dlls/
+.vscode/
+build/
+cmake-build-*/
+bin/
+debug/
+*.o
+.idea/
+
+output\.txt
+
+run_yijin\.py
+
+split\.py
