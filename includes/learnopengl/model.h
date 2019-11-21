@@ -38,10 +38,17 @@ public:
     Model(string const &path, bool gamma = false) : gammaCorrection(gamma)
     {
         loadModel(path);
-        // for (auto &mesh : meshes) {
-        //     mesh.SetupMeshAfterInitialize();
-        // }
-        merge_meshes();
+        for (auto &mesh : meshes) {
+            mesh.SetupMeshAfterInitialize();
+        }
+        unsigned long int tri_count = 0;
+        for (auto &mesh : meshes) {
+            tri_count += mesh.indices.size();
+        }
+        printf("vector<mesh> size: %lu\n", meshes.size());
+        printf("triangles size: %lu\n", tri_count);
+        printf("texture size %lu\n", textures_loaded.size());
+        // merge_meshes();
     }
 
     // draws the model, and thus all its meshes
@@ -59,8 +66,6 @@ private:
             tri_count += mesh.indices.size();
         }
         tri_count /= 3;
-        printf("vecotr<mesh> size: %lu\n", meshes.size());
-        printf("triangles size: %lu\n", tri_count);
         Mesh new_mesh;
         unsigned int sum = 0;
         for (auto &mesh : meshes) {
@@ -123,6 +128,8 @@ private:
         vector<unsigned int> indices;
         vector<Texture> textures;
 
+        printf("mesh has vertex color %d\n", mesh->HasVertexColors(0));
+
         // Walk through each of the mesh's vertices
         for(unsigned int i = 0; i < mesh->mNumVertices; i++)
         {
@@ -150,16 +157,33 @@ private:
             }
             else
                 vertex.TexCoords = glm::vec2(0.0f, 0.0f);
-            // // tangent
-            // vector.x = mesh->mTangents[i].x;
-            // vector.y = mesh->mTangents[i].y;
-            // vector.z = mesh->mTangents[i].z;
-            // vertex.Tangent = vector;
-            // // bitangent
-            // vector.x = mesh->mBitangents[i].x;
-            // vector.y = mesh->mBitangents[i].y;
-            // vector.z = mesh->mBitangents[i].z;
-            // vertex.Bitangent = vector;
+            // tangent
+            if (mesh->HasTangentsAndBitangents()) {
+                vector.x = mesh->mTangents[i].x;
+                vector.y = mesh->mTangents[i].y;
+                vector.z = mesh->mTangents[i].z;
+                vertex.Tangent = vector;
+                // bitangent
+                vector.x = mesh->mBitangents[i].x;
+                vector.y = mesh->mBitangents[i].y;
+                vector.z = mesh->mBitangents[i].z;
+                vertex.Bitangent = vector;
+            } else {
+                vertex.Tangent = glm::vec3(0.0f, 0.0f, 0.0f);
+                vertex.Bitangent = glm::vec3(0.0f, 0.0f, 0.0f);
+            }
+            // Color
+            // printf("%d\n", AI_MAX_NUMBER_OF_COLOR_SETS);
+            if (mesh->HasVertexColors(0)) {
+                vector.x = mesh->mColors[0][i].r / 255;
+                vector.y = mesh->mColors[0][i].g / 255;
+                vector.z = mesh->mColors[0][i].b / 255;
+                // printf("%f %f %f\n", vector.x, vector.y, vector.z);
+                vertex.Color = vector;
+            } else {
+                vertex.Color = glm::vec3(0.0f, 0.0f, 0.0f);
+            }
+            
             vertices.push_back(vertex);
         }
         // now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.

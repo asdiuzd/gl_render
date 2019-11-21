@@ -14,6 +14,8 @@
 #include "util.hpp"
 #include "gl_renderer.hpp"
 #include <dirent.h>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 #include <iostream>
 #include <map>
@@ -39,47 +41,45 @@ int main(int argc, char ** argv) {
     // argv[1] shader path
     // argv[2] obj path
     // argv[3] pose path
+    // argv[4] save_path
     Renderer renderer(argv[1], argv[2]);
 
-    printf("123\n");
+    std::string folder(argv[3]);
+    vector<string> filenames = read_directory(folder);
 
-    // auto files = read_directory(argv[3]);
-    // vector<string> pose_files;
-    // for (auto &file : files) {
-    //     if (file.find("normpose") != string::npos) {
-    //         pose_files.emplace_back(file);
-    //     }
-    //     // printf("%s\n", files[i].c_str());
-    // }
+    for (auto filename : filenames) {
+        if (filename.find(".txt") == std::string::npos) continue;
+        
+        std::string fullname = folder + string("/") + filename;
+        std::cout << fullname << std::endl;
+        ifstream pose_file(fullname.c_str());
+        double rt[3][4];
 
-    
-    // std::sort(pose_files.begin(), pose_files.end());
+        pose_file >> rt[0][0] >> rt[0][1] >> rt[0][2] >> rt[0][3]
+                    >> rt[1][0] >> rt[1][1] >> rt[1][2] >> rt[1][3]
+                    >> rt[2][0] >> rt[2][1] >> rt[2][2] >> rt[2][3];
+        
+        Eigen::Matrix3f rotation_matrix;
+        rotation_matrix << rt[0][0], rt[0][1], rt[0][2],
+                            rt[1][0], rt[1][1], rt[1][2],
+                            rt[2][0], rt[2][1], rt[2][2];
+        Eigen::Quaternionf rotation_q(rotation_matrix);
+        Eigen::Vector3f translation;
+        translation << rt[0][3], rt[1][3], rt[2][3];
 
-    
-    // renderer.render_single_frame(rotation, translation, string(argv[4]));
+        Eigen::Matrix3f intrinsics;
+        intrinsics << 1673.274048, 0, 960,
+                        0, 1673.274048, 540,
+                        0, 0, 1;
 
-    // ifstream pose_file(argv[3]);
+        Eigen::Quaternionf tmp_q = rotation_q.conjugate();
+        rotation_q = tmp_q;
+        Eigen::Vector3f tmp_t = -(rotation_q * translation);
+        translation = tmp_t;
 
-    // while (1) {
-    //     std::string line;
-    //     Eigen::Quaternionf rotation;
-    //     Eigen::Vector3f translation;
-    //     string name;
-    //     double qt[4];
-
-    //     getline(pose_file, line);
-    //     std::istringstream iss(line);
-    //     iss >> name;
-    //     iss >> qt[0] >> qt[1] >> qt[2];
-    //     translation << qt[0], qt[1], qt[2];
-    //     iss >> qt[0] >> qt[1] >> qt[2] >> qt[3];
-    //     rotation = Eigen::Quaternionf(qt[0], qt[1], qt[2], qt[3]);
-
-    //     std::cout << name << std::endl;
-    //     // printf("%s\n", pose_files[i].c_str());
-    //     renderer.render_single_frame(rotation, translation, string(argv[4]));
-    // }
-
+        // renderer.render_single_frame(rotation_q, translation, intrinsics);
+        renderer.render_single_frame(rotation_q, translation, intrinsics, filename, string(argv[4]));
+    }
 
 
     return 0;

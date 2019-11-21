@@ -27,11 +27,11 @@
 GLFWwindow* window;
 
 // settings
-const unsigned int SCR_WIDTH = 640;
-const unsigned int SCR_HEIGHT = 480;
+const unsigned int SCR_WIDTH = 1920/2;
+const unsigned int SCR_HEIGHT = 1080/2;
 
 const float near = 0.01;
-const float far = 100;
+const float far = 1000;
 
 int return_value = 0;
 
@@ -42,7 +42,7 @@ int return_value = 0;
 #define SAVE_OTHER 5
 
 
-#define SHOW_DEPTH
+// #define SHOW_DEPTH
 // #define USE_CAM_IN_POSE
 
 
@@ -176,44 +176,20 @@ public:
         glfwTerminate();
     }
 
-    int render_single_frame(Eigen::Quaternionf rotation, Eigen::Vector3f translation, string output_path = "") {
+    int render_single_frame(Eigen::Quaternionf rotation, Eigen::Vector3f translation, Eigen::Matrix3f intrinsics,
+                            string filename, string output_path = "") {
 
-        // ifstream pose_file(filename.c_str());
-        // double rt[3][4];
-
-        // pose_file >> rt[0][0] >> rt[0][1] >> rt[0][2] >> rt[0][3]
-        //           >> rt[1][0] >> rt[1][1] >> rt[1][2] >> rt[1][3]
-        //           >> rt[2][0] >> rt[2][1] >> rt[2][2] >> rt[2][3];
-        
-        // Eigen::Matrix3f rotation_matrix;
-        // rotation_matrix << rt[0][0], rt[0][1], rt[0][2],
-        //                    rt[1][0], rt[1][1], rt[1][2],
-        //                    rt[2][0], rt[2][1], rt[2][2];
-
-        // Eigen::Vector3f translation;
-        // translation << rt[0][3], rt[1][3], rt[2][3];
-        // translation(0) = translation(0) + 0.0245;
-
-        // Twc
-        // Eigen::Quaternionf rotation(rotation_matrix);
-        // Eigen::Vector3f new_translation = translation;
         // Twc to Tcw
         // Eigen::Matrix3f new_rotation_matrix = rotation_matrix.transpose().eval();
         // Eigen::Quaternionf rotation(new_rotation_matrix);
         // Eigen::Vector3f new_translation = - new_rotation_matrix * translation;
 
-        // tx += 0.0245
-
-        Eigen::Matrix3f intrinsics;
-        intrinsics << 1673.274048, 0, 960,
-                        0, 1673.274048, 540,
-                        0, 0, 1;
-
         float fov_y = std::atan(intrinsics(1, 2) / intrinsics(1, 1)) * 2;
-        fov_y = 100 * M_PI / 180;
+        // fov_y = 100 * M_PI / 180;
         glm::mat4 projectionMatrix = glm::perspective(
             fov_y, // The vertical Field of View, in radians
-            (float)SCR_WIDTH / SCR_HEIGHT,       // Aspect Ratio. Depends on the size of your window. Notice that 4/3 == 800/600 == 1280/960, sounds familiar ?
+            // width / height
+            (float)(intrinsics(0, 2)*2) / (intrinsics(1, 2)*2),       // Aspect Ratio. Depends on the size of your window. Notice that 4/3 == 800/600 == 1280/960, sounds familiar ?
             near,              // Near clipping plane. Keep as big as possible, or you'll get precision issues.
             far             // Far clipping plane. Keep as little as possible.
         );
@@ -249,28 +225,15 @@ public:
         nanosuit.Draw(shaderGeometryPass);
 
 #ifndef SHOW_DEPTH
-        string filename = "/home/eugenelee/data/cambriage/"
+        // string filename = "/home/eugenelee/data/cambriage/"
         assert(output_path != "");
-        string save_filename;
-        size_t pos = filename.rfind("/");
-        assert(pos != string::npos);
-        save_filename = filename.substr(pos+1, filename.size()-pos);
-        size_t pos2 = filename.rfind("/", pos-1);
-        assert(pos2 != string::npos);
-        save_filename = filename.substr(pos2+1, pos - pos2-1) + string("-") + save_filename;
+        string save_filename = filename;
+        save_filename = save_filename.replace(save_filename.find("pose"), 4, "rgb");
+        save_filename = save_filename.replace(save_filename.find("txt"), 3, "png");
         if (output_path != "") {
             save_filename = output_path + save_filename;
         }
-        assert(save_filename.find("txt") != string::npos);
-        save_filename = save_filename.replace(save_filename.find("txt"), 3, "bin");
-        // printf("%s %s\n", filename.c_str(), save_filename.c_str());
-        FILE *depth_file = fopen(save_filename.c_str(), "wb");
-        if (depth_file == NULL) {
-            printf("Error opening file!\n");
-            exit(1);
-        }
-        fwrite(&SCR_WIDTH, 4, 1, depth_file);
-        fwrite(&SCR_HEIGHT, 4, 1, depth_file);
+        std::cout << save_filename << std::endl;
 #endif
 
 
@@ -293,38 +256,30 @@ public:
 
 
         float *cam_xyz_buffer = new float[SCR_WIDTH*SCR_HEIGHT * 3];
-        cv::Mat img(1080, 1920, CV_32FC1);
-        float min = 10000, max = -10000;
+        cv::Mat img(SCR_HEIGHT, SCR_WIDTH, CV_8UC3);
+        unsigned char *img_data = (unsigned char *)img.data;
         glReadBuffer(GL_COLOR_ATTACHMENT0);
-        //glReadPixels(0, 0, SCR_WIDTH, SCR_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, id_buffer);
         glReadPixels(0, 0, SCR_WIDTH, SCR_HEIGHT, GL_RGB, GL_FLOAT, cam_xyz_buffer);
         for (int i = 0; i < SCR_WIDTH*SCR_HEIGHT; i++) {
-            float x = cam_xyz_buffer[i * 3 + 0];
-            float y = cam_xyz_buffer[i * 3 + 1];
-            float depth = cam_xyz_buffer[i * 3 + 2];
-            img.at<float>(1080-1-i/SCR_WIDTH, i%SCR_WIDTH, 0) = depth/6;
-#ifndef SHOW_DEPTH
-            // fwrite(&x, 4, 1, depth_file);
-            // fwrite(&y, 4, 1, depth_file);
-            fwrite(&depth, 4, 1, depth_file);
-#endif
-            if (depth > max) max = depth;
-            if (depth < min) min = depth;
+            img_data[i * 3 + 2] = cam_xyz_buffer[i * 3 + 0] * 255; // r
+            img_data[i * 3 + 1] = cam_xyz_buffer[i * 3 + 1] * 255; // g
+            img_data[i * 3 + 0] = cam_xyz_buffer[i * 3 + 2] * 255; // b
         }
-        // printf("max %f\nmin %f\n", max, min);
+        cv::flip(img, img, 0);
+        cv::imwrite(save_filename, img);
         // cv::imshow("test", img);
         // cv::waitKey(0);
 
 
         // glfwSetWindowShouldClose(window, true);
 #ifndef SHOW_DEPTH
-        fclose(depth_file);
+        // fclose(depth_file);
 #endif
 
-// #ifdef USE_CAM_IN_POSE
-//         projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-//         view = camera.GetViewMatrix();
-// #endif
+#ifdef USE_CAM_IN_POSE
+        projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        view = camera.GetViewMatrix();
+#endif
 
     #ifdef SHOW_DEPTH
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
