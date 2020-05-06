@@ -270,6 +270,8 @@ public:
         // cv::imshow("test", img);
         // cv::waitKey(0);
 
+        delete cam_xyz_buffer;
+
 
         // glfwSetWindowShouldClose(window, true);
 #ifndef SHOW_DEPTH
@@ -297,10 +299,10 @@ public:
             glfwSwapBuffers(window);
             glfwPollEvents();
         
-        delete cam_xyz_buffer;
         
         }
     #endif
+
 
 
         return return_value;
