@@ -76,17 +76,19 @@ int main(int argc, char ** argv) {
         translation << rt[0][3], rt[1][3], rt[2][3];
 
         Eigen::Matrix3f intrinsics;
-        // intrinsics << 1673.274048, 0, 960,
-        //                 0, 1673.274048, 540,
-        //                 0, 0, 1;
-        intrinsics << 384.35386606462447, 0, 319.28590839603237,
-                        0, 384.9560729180638, 239.87334366520707,
+        //  cambridge intrinsics
+        intrinsics << 1673.274048, 0, 960,
+                        0, 1673.274048, 540,
                         0, 0, 1;
+        // seven scenes intrinsics
+        // intrinsics << 384.35386606462447, 0, 319.28590839603237,
+        //                 0, 384.9560729180638, 239.87334366520707,
+        //                 0, 0, 1;
 
-        Eigen::Quaternionf tmp_q = rotation_q.conjugate();
-        rotation_q = tmp_q;
-        Eigen::Vector3f tmp_t = -(rotation_q * translation);
-        translation = tmp_t;
+        // Eigen::Quaternionf tmp_q = rotation_q.conjugate();
+        // rotation_q = tmp_q;
+        // Eigen::Vector3f tmp_t = -(rotation_q * translation);
+        // translation = tmp_t;
 
         std::cout << rotation_matrix << std::endl;
         std::cout << translation << std::endl;
