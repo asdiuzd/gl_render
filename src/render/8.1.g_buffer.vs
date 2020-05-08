@@ -15,9 +15,11 @@ uniform mat4 projection;
 out vec4 camPos;
 out vec4 FragCoord;
 out vec3 v_color;
+// out vec3 point_position;
 
 void main()
 {
+//    point_position = aPos;
     vec4 worldPos = model * vec4(aPos, 1.0);
     camPos = view * worldPos;
     gl_Position = projection * view * worldPos;

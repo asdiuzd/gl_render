@@ -95,7 +95,7 @@ getCameraIntrinsics(const boost::property_tree::ptree &pt) {
 // }
 
 // ref: https://jinyu.li/2017/02/09/intrinsic-to-viewproj/
-glm::mat4 convert2projection_matrix(Eigen::Matrix3f intrinsic, float w, float h,
+inline glm::mat4 convert2projection_matrix(Eigen::Matrix3f intrinsic, float w, float h,
                                     float n = 0.01, float f = 300) {
     float fx = intrinsic(0, 0), fy = intrinsic(1, 1);
     float cx = intrinsic(0, 2), cy = intrinsic(1, 2);
@@ -109,7 +109,7 @@ glm::mat4 convert2projection_matrix(Eigen::Matrix3f intrinsic, float w, float h,
     return projection_matrix;
 }
 
-glm::mat4 convert2view_matrix(Eigen::Quaternionf rotation, Eigen::Vector3f translation) {
+inline glm::mat4 convert2view_matrix(Eigen::Quaternionf rotation, Eigen::Vector3f translation) {
     // Eigen::Vector3f slam_up = {0, -1, 0};
     // Eigen::Vector3f slam_forward = {0, 0, 1};
     Eigen::Vector3f slam_up = {0, -1, 0};
@@ -123,7 +123,7 @@ glm::mat4 convert2view_matrix(Eigen::Quaternionf rotation, Eigen::Vector3f trans
     return view_matrix;
 }
 
-void print_progress_bar(float progress) {
+inline void print_progress_bar(float progress) {
     int barWidth = 70;
     std::cout << "[";
     int pos = barWidth * progress;

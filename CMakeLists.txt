@@ -88,6 +88,7 @@ endmacro()
 # then create a project file per tutorial
 file(GLOB SOURCE
     "src/render/*.h"
+    "src/render/*.hpp"
     "src/render/*.cpp"
     "src/render/*.vs"
     "src/render/*.fs"
@@ -99,7 +100,7 @@ target_link_libraries(${NAME} ${LIBS})
 if(WIN32)
     set_target_properties(${NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
 elseif(UNIX AND NOT APPLE)
-    set_target_properties(${NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin")
+    set_target_properties(${NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
 elseif(APPLE)
     set_target_properties(${NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin")
     set_target_properties(${NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_BINARY_DIR}/bin")
