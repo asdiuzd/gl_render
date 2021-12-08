@@ -21,12 +21,11 @@
 #include <opencv2/opencv.hpp>
 #include "gl_renderer.hpp"
 
-
-GLFWwindow* window;
+GLFWwindow *window;
 
 // settings
-const unsigned int SCR_WIDTH = 1920/2;
-const unsigned int SCR_HEIGHT = 1080/2;
+const unsigned int SCR_WIDTH = 640;
+const unsigned int SCR_HEIGHT = 480;
 //const unsigned int SCR_WIDTH = 852;
 //const unsigned int SCR_HEIGHT = 480;
 
@@ -41,36 +40,38 @@ int return_value = 0;
 #define WITH_DRAW 4
 #define SAVE_OTHER 5
 
-
 // #define SHOW_DEPTH
 // #define USE_CAM_IN_POSE
 
-
-
-
 #ifndef USE_CAM_IN_POSE
 
-inline void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+inline void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
+{
     // if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
     //     glfwSetWindowShouldClose(window, true);
     // }
-    if (key == GLFW_KEY_DELETE && action == GLFW_PRESS) {
+    if (key == GLFW_KEY_DELETE && action == GLFW_PRESS)
+    {
         glfwSetWindowShouldClose(window, true);
         return_value = DELETE_FRAME;
     }
-    if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
+    if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+    {
         glfwSetWindowShouldClose(window, true);
         return_value = LAST_FRAME;
     }
-    if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
+    if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
+    {
         glfwSetWindowShouldClose(window, true);
         return_value = NEXT_FRAME;
     }
-    if (key == GLFW_KEY_BACKSPACE && action == GLFW_PRESS) {
+    if (key == GLFW_KEY_BACKSPACE && action == GLFW_PRESS)
+    {
         glfwSetWindowShouldClose(window, true);
         return_value = WITH_DRAW;
     }
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    {
         glfwSetWindowShouldClose(window, true);
         return_value = SAVE_OTHER;
     }
@@ -158,6 +159,8 @@ inline void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 
 Renderer::Renderer(const std::string shader_path, const std::string shader_name, const std::string obj_path)
 {
+    std::cout << (shader_path + "/" + shader_name + ".vs").c_str() << "\n"
+              << (shader_path + "/" + shader_name + ".fs").c_str();
     setup_opengl();
     std::cout << (shader_path + "/" + shader_name + ".vs").c_str() << "\n"
               << (shader_path + "/" + shader_name + ".fs").c_str();
@@ -239,9 +242,8 @@ float *Renderer::render_single_frame(Eigen::Quaternionf rotation, Eigen::Vector3
         // }
 #endif
 
-
-        //save_filename = save_filename.replace(save_filename.find("txt"), 3, "png");
-        //save_filename = output_path + "/" + save_filename;
+        save_filename = save_filename.replace(save_filename.find("txt"), 3, "png");
+        save_filename = output_path + "/" + save_filename;
         //std::cout << save_filename << std::endl;
         static bool flag = true;
         if (flag)

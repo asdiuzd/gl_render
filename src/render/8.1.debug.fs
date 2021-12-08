@@ -13,4 +13,5 @@ void main() {
     // fragColor = vec4(depth, depth, depth, 1.f); 
     // float depth = -camPos.z/6;
     fragColor = vec4(v_color.x, v_color.y, v_color.z, 1.f); 
+    // fragColor = vec4(255/255.f, 255/255.f, 251/255.f, 1.f); 
 }

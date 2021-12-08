@@ -28,12 +28,13 @@
 #include <sys/types.h>
 #include <dirent.h>
 
-
-vector<string> read_directory(const std::string& name) {
+vector<string> read_directory(const std::string &name)
+{
     vector<string> files;
-    DIR* dirp = opendir(name.c_str());
-    struct dirent * dp;
-    while ((dp = readdir(dirp)) != NULL) {
+    DIR *dirp = opendir(name.c_str());
+    struct dirent *dp;
+    while ((dp = readdir(dirp)) != NULL)
+    {
         files.push_back(string(dp->d_name));
     }
     closedir(dirp);
@@ -42,14 +43,16 @@ vector<string> read_directory(const std::string& name) {
 }
 
 int sc_projection(int argc, char **argv);
-int mesh_projection(int argc, char ** argv);
+int mesh_projection(int argc, char **argv);
 
-int main(int argc, char ** argv) {
+int main(int argc, char **argv)
+{
     sc_projection(argc, argv);
-    //mesh_projection(argc, argv);
+    // mesh_projection(argc, argv);
 }
 
-int sc_projection(int argc, char **argv) {
+int sc_projection(int argc, char **argv)
+{
     std::string shader_dir(argv[1]);
     std::string shader_name(argv[2]);
     std::string obj_path(argv[3]);
@@ -63,14 +66,13 @@ int sc_projection(int argc, char **argv) {
         obj_path,
         base_dir,
         out_dir,
-        intrinsic_fn
-    );
+        intrinsic_fn);
 
     return 0;
-
 }
 
-int mesh_projection(int argc, char ** argv) {
+int mesh_projection(int argc, char **argv)
+{
 
     // argv[1] shader path
     // argv[2] shader_name
@@ -79,6 +81,8 @@ int mesh_projection(int argc, char ** argv) {
     // argv[5] save_path
     // argv[6] intrinsics
     printf("build render\n");
+    cout << "shader path:" << argv[1] << endl;
+    cout << "shader name:" << argv[2] << endl;
     Renderer renderer(argv[1], argv[2], argv[3]);
     printf("out\n");
 
@@ -90,12 +94,14 @@ int mesh_projection(int argc, char ** argv) {
     // printf("start idx %d\n", start_idx);
     int ct = 0;
 
-    for (auto filename : filenames) {
+    for (auto filename : filenames)
+    {
         // if (++ct < start_idx) {
         //     continue;
         // }
-        if (filename.find(".txt") == std::string::npos) continue;
-        //printf(filename);
+        if (filename.find(".txt") == std::string::npos)
+            continue;
+        // printf(filename);
 
         std::cout << filename << std::endl;
         std::string fullname = folder + string("/") + filename;
@@ -103,14 +109,14 @@ int mesh_projection(int argc, char ** argv) {
         ifstream pose_file(fullname.c_str());
         double rt[3][4];
 
-        pose_file >> rt[0][0] >> rt[0][1] >> rt[0][2] >> rt[0][3]
-                    >> rt[1][0] >> rt[1][1] >> rt[1][2] >> rt[1][3]
-                    >> rt[2][0] >> rt[2][1] >> rt[2][2] >> rt[2][3];
+        pose_file >> rt[0][0] >> rt[0][1] >> rt[0][2] >> rt[0][3] >> rt[1][0] >> rt[1][1] >> rt[1][2] >> rt[1][3] >> rt[2][0] >> rt[2][1] >> rt[2][2] >> rt[2][3];
 
         Eigen::Matrix3f rotation_matrix;
         rotation_matrix << rt[0][0], rt[0][1], rt[0][2],
-                            rt[1][0], rt[1][1], rt[1][2],
-                            rt[2][0], rt[2][1], rt[2][2];
+            rt[1][0], rt[1][1], rt[1][2],
+            rt[2][0], rt[2][1], rt[2][2];
+
+        cout << rotation_matrix << endl;
         Eigen::Quaternionf rotation_q(rotation_matrix);
         Eigen::Vector3f translation;
         translation << rt[0][3], rt[1][3], rt[2][3];
@@ -118,8 +124,10 @@ int mesh_projection(int argc, char ** argv) {
         Eigen::Matrix3f intrinsics;
         //  cambridge intrinsics
         ifstream intrinsitc_if(argv[6]);
-        for (int r = 0; r < 3; r++) {
-            for (int c = 0; c < 3; c++) {
+        for (int r = 0; r < 3; r++)
+        {
+            for (int c = 0; c < 3; c++)
+            {
                 intrinsitc_if >> intrinsics(r, c);
             }
         }
@@ -142,7 +150,6 @@ int mesh_projection(int argc, char ** argv) {
         // renderer.render_single_frame(rotation_q, translation, intrinsics);
         renderer.render_single_frame(rotation_q, translation, intrinsics, filename, string(argv[5]));
     }
-
 
     return 0;
 }
