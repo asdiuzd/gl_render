@@ -36,7 +36,7 @@
  mkdir -p ../out/greatcourt/seq5
 
  ../bin/render ../src/render 8.1.g_buffer.scene_coordinate \
- ~/Dataset/CambridgeLandmarks/GreatCourt/greatcourt.obj \
- ~/Dataset/CambridgeLandmarks/GreatCourt/ \
+../data/cambridge_data/GreatCourt/greatcourt.obj \
+../data/cambridge_data/GreatCourt \
  ../out/greatcourt/ \
  cambridge_intrinsics.txt
