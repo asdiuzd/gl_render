@@ -41,51 +41,57 @@ inline std::vector<PoseData> load_cambridge_pose_txt(const std::string &filename
     cout << filename << endl;
     if (FILE *file = fopen(filename.c_str(), "r"))
     {
-        // char header_line[2048];
-        // // skip three useless lines
-        // char *unused = fgets(header_line, 100, file);
-        // unused = fgets(header_line, 100, file);
-        // unused = fgets(header_line, 100, file);
-        // char filename_buffer[2048];
+        char header_line[2048];
+        // skip three useless lines
+        char *unused = fgets(header_line, 100, file);
+        unused = fgets(header_line, 100, file);
+        unused = fgets(header_line, 100, file);
+        char filename_buffer[2048];
         PoseData pose;
         int cnt = 0;
-        // while (!feof(file))
-        // {
-        //     if (fscanf(file, "%f %f %f %f %f %f %f", &pose.p.x(), &pose.p.y(), &pose.p.z(), &pose.q.x(), &pose.q.y(), &pose.q.z(), &pose.q.w()) != 7)
-        //     {
-        //         break;
-        //     }
-        //     // convert to Twc
-        //     pose.q.normalize();
-        //     // pose.q = pose.q.conjugate();
-        //     pose_data.push_back(pose);
-        // }
-        for (int i = 0; i < 1005; i++)
+        while (!feof(file))
         {
-            char filename[256];
-            sprintf(filename, "/home/zhouhan/data/code/computer-vision/visual-localization/gl_render/sense_pose/frame-%06d.txt", i);
-            cout << filename << endl;
-            ifstream pose_file(filename);
-            double rt[3][4];
+            if (fscanf(file, "%s %f %f %f %f %f %f %f", filename_buffer, &pose.p.x(), &pose.p.y(), &pose.p.z(), &pose.q.w(), &pose.q.x(), &pose.q.y(), &pose.q.z()) != 8)
+            {
+                break;
+            }
+            // convert to Twc
+            pose.q.normalize();
+            pose.q = pose.q.conjugate();
+            pose.filename = filename_buffer;
+            pose.focal = focal_map[pose.filename];
 
-            pose_file >> rt[0][0] >> rt[0][1] >> rt[0][2] >> rt[0][3] >> rt[1][0] >> rt[1][1] >> rt[1][2] >> rt[1][3] >> rt[2][0] >> rt[2][1] >> rt[2][2] >> rt[2][3];
-
-            Eigen::Matrix3f rotation_matrix;
-            rotation_matrix << rt[0][0], rt[0][1], rt[0][2],
-                rt[1][0], rt[1][1], rt[1][2],
-                rt[2][0], rt[2][1], rt[2][2];
-
-            cout << rotation_matrix << endl;
-            Eigen::Quaternionf rotation_q(rotation_matrix);
-            PoseData pose;
-            pose.q = rotation_q;
-            pose.p.x() = rt[0][3];
-            pose.p.y() = rt[1][3];
-            pose.p.z() = rt[2][3];
-            cout << rotation_matrix << endl;
+            // pose.q = pose.q.conjugate();
+            // pose.p = - pose.q.toRotationMatrix() * pose.p;
+            cout << filename_buffer << " " << pose.p << endl;
             pose_data.push_back(pose);
         }
-        fclose(file);
+        // for (int i = 0; i < 1005; i++)
+        // {
+        //     char filename[256];
+        //     sprintf(filename, "/home/zhouhan/data/code/computer-vision/visual-localization/gl_render/sense_pose/frame-%06d.txt", i);
+        //     cout << filename << endl;
+        //     ifstream pose_file(filename);
+        //     double rt[3][4];
+
+        //     pose_file >> rt[0][0] >> rt[0][1] >> rt[0][2] >> rt[0][3] >> rt[1][0] >> rt[1][1] >> rt[1][2] >> rt[1][3] >> rt[2][0] >> rt[2][1] >> rt[2][2] >> rt[2][3];
+
+        //     Eigen::Matrix3f rotation_matrix;
+        //     rotation_matrix << rt[0][0], rt[0][1], rt[0][2],
+        //         rt[1][0], rt[1][1], rt[1][2],
+        //         rt[2][0], rt[2][1], rt[2][2];
+
+        //     cout << rotation_matrix << endl;
+        //     Eigen::Quaternionf rotation_q(rotation_matrix);
+        //     PoseData pose;
+        //     pose.q = rotation_q;
+        //     pose.p.x() = rt[0][3];
+        //     pose.p.y() = rt[1][3];
+        //     pose.p.z() = rt[2][3];
+        //     cout << rotation_matrix << endl;
+        //     pose_data.push_back(pose);
+        // }
+        // fclose(file);
     }
     else
     {
@@ -105,10 +111,11 @@ void scene_coordinate_projection(
 
     std::map<std::string, float> focal_map;
     auto poses_twc_train = load_cambridge_pose_txt(base_dir + "/dataset_train.txt", focal_map);
-    std::cout << "-----" << base_dir + "/dataset_train.txt" << std::endl;
+    auto poses_twc_test = load_cambridge_pose_txt(base_dir + "/dataset_test.txt", focal_map);
 
-    std::vector<PoseData>
-        poses_twc_all = poses_twc_train;
+    std::vector<PoseData> poses_twc_all = poses_twc_train;
+    poses_twc_all.insert(poses_twc_all.end(), poses_twc_test.begin(), poses_twc_test.end());
+
 
     cout << poses_twc_all.size() << endl;
 
@@ -139,13 +146,17 @@ void scene_coordinate_projection(
     int cnt = 0;
     for (auto &pose : poses_twc_all)
     {
-        sprintf(buffer, "frame-%06d.txt", cnt);
-        filename = buffer;
-        std::string input_pose_fn = base_dir + filename;
-        sprintf(buffer, "frame-%06d.png", cnt++);
-        filename = buffer;
-        std::string output_vis_fn = out_dir + filename;
-        std::string output_bin_fn = out_dir + filename.replace(filename.end() - 3, filename.end(), "bin");
+        // sprintf(buffer, "frame-%06d.txt", cnt);
+        // filename = buffer;
+        // std::string input_pose_fn = base_dir + filename;
+        // sprintf(buffer, "frame-%06d.png", cnt++);
+        // filename = buffer;
+        // std::string output_vis_fn = out_dir + filename;
+        // std::string output_bin_fn = out_dir + filename.replace(filename.end() - 3, filename.end(), "bin");
+        std::string output_vis_fn = out_dir + pose.filename;
+        std::string input_pose_fn = base_dir + pose.filename.replace(pose.filename.end() - 3, pose.filename.end(), "txt");
+        std::string output_bin_fn = out_dir + pose.filename.replace(pose.filename.end() - 3, pose.filename.end(), "bin");
+
         cout << "input pose fn = " << input_pose_fn << endl;
         cout << "pose file name = " << pose.filename << endl;
         cout << "output bin fn = " << output_bin_fn << endl;

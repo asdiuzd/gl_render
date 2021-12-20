@@ -29,14 +29,12 @@
 #../out/OldHospital/ \
 #cambridge_intrinsics.txt
 
- mkdir -p ../out/greatcourt/seq1
- mkdir -p ../out/greatcourt/seq2
- mkdir -p ../out/greatcourt/seq3
- mkdir -p ../out/greatcourt/seq4
- mkdir -p ../out/greatcourt/seq5
+ mkdir -p ../out/ShopFacade/seq1
+ mkdir -p ../out/ShopFacade/seq2
+ mkdir -p ../out/ShopFacade/seq3
 
  ../bin/render ../src/render 8.1.g_buffer.scene_coordinate \
-../data/cambridge_data/GreatCourt/greatcourt.obj \
-../data/cambridge_data/GreatCourt \
- ../out/greatcourt/ \
+../data/cambridge_data/ShopFacade/ShopFacade_clean.obj \
+../data/cambridge_data/ShopFacade/ \
+ ../out/ShopFacade/ \
  cambridge_intrinsics.txt
