@@ -1,40 +1,9 @@
-# mkdir -p ../out/kingscollege/seq1
-# mkdir -p ../out/kingscollege/seq2
-# mkdir -p ../out/kingscollege/seq3
-# mkdir -p ../out/kingscollege/seq4
-# mkdir -p ../out/kingscollege/seq5
-# mkdir -p ../out/kingscollege/seq6
-# mkdir -p ../out/kingscollege/seq7
-# mkdir -p ../out/kingscollege/seq8
+ mkdir -p ../out/kings/seq1
+ mkdir -p ../out/kings/seq2
+ mkdir -p ../out/kings/seq3
 
-# ../bin/render ../src/render 8.1.g_buffer.scene_coordinate \
-# ~/Dataset/CambridgeLandmarks/KingsCollege/kingscollege.obj \
-# ~/Dataset/CambridgeLandmarks/KingsCollege/ \
-# ../out/kingscollege/ \
-# cambridge_intrinsics.txt
-
-#mkdir -p ../out/OldHospital/seq1
-#mkdir -p ../out/OldHospital/seq2
-#mkdir -p ../out/OldHospital/seq3
-#mkdir -p ../out/OldHospital/seq4
-#mkdir -p ../out/OldHospital/seq5
-#mkdir -p ../out/OldHospital/seq6
-#mkdir -p ../out/OldHospital/seq7
-#mkdir -p ../out/OldHospital/seq8
-#mkdir -p ../out/OldHospital/seq9
-
-#../bin/render ../src/render 8.1.g_buffer.scene_coordinate \
-#~/Dataset/CambridgeLandmarks/OldHospital/oldhospital_clean.obj \
-#~/Dataset/CambridgeLandmarks/OldHospital/ \
-#../out/OldHospital/ \
-#cambridge_intrinsics.txt
-
- mkdir -p ../out/ShopFacade/seq1
- mkdir -p ../out/ShopFacade/seq2
- mkdir -p ../out/ShopFacade/seq3
-
- ../bin/render ../src/render 8.1.g_buffer.scene_coordinate \
-../data/cambridge_data/ShopFacade/ShopFacade_clean.obj \
-../data/cambridge_data/ShopFacade/ \
- ../out/ShopFacade/ \
- cambridge_intrinsics.txt
+../bin/render ../src/render 8.1.g_buffer.scene_coordinate \
+~/dataset/cambridge/CambridgeObj/KingsCollege/kingscollege.obj \
+~/dataset/cambridge/KingsCollege \
+../out/kings/ \
+cambridge_intrinsics.txt
