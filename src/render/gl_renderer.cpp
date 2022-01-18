@@ -24,13 +24,14 @@
 GLFWwindow *window;
 
 // settings
-// const unsigned int SCR_WIDTH = 640;
-// const unsigned int SCR_HEIGHT = 480;
 //const unsigned int SCR_WIDTH = 852;
 //const unsigned int SCR_HEIGHT = 480;
 
-const unsigned int SCR_WIDTH = 1920;
-const unsigned int SCR_HEIGHT = 1080;
+const unsigned int SCR_WIDTH = 640;
+const unsigned int SCR_HEIGHT = 480;
+
+// const unsigned int SCR_WIDTH = 1920 / 2;
+// const unsigned int SCR_HEIGHT = 1080 / 2;
 
 const float near = 0.01;
 const float far = 1000;
@@ -244,7 +245,6 @@ float *Renderer::render_single_frame(Eigen::Quaternionf rotation, Eigen::Vector3
         //     save_filename = output_path + save_filename;
         // }
 #endif
-
         save_filename = save_filename.replace(save_filename.find("txt"), 3, "png");
         save_filename = output_path + "/" + save_filename;
         //std::cout << save_filename << std::endl;

@@ -60,13 +60,23 @@ int sc_projection(int argc, char **argv)
     std::string out_dir(argv[5]);
     std::string intrinsic_fn(argv[6]);
 
+    std::string dataset("cambridge");
+    std::string scene("KingsCollege");
+
+    if (argc > 7) {
+        dataset = std::string("7scenes");
+        scene = std::string(argv[7]);
+    }
+
     scene_coordinate_projection(
         shader_dir,
         shader_name,
         obj_path,
         base_dir,
         out_dir,
-        intrinsic_fn);
+        intrinsic_fn,
+        dataset,
+        scene);
 
     return 0;
 }

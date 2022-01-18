@@ -26,6 +26,8 @@
 
 #include "scene_coordinate_projection.hpp"
 
+bool process_cambridge = false;
+
 struct PoseData
 {
     std::string filename;
@@ -33,6 +35,96 @@ struct PoseData
     Eigen::Vector3f p;
     float focal;
 };
+
+bool load_sequences(const std::string& fn, vector<string>& seqs) {
+    ifstream in(fn);
+
+    while (!in.eof()) {
+        string seq;
+        in >> seq;
+        if (seq == "") {
+            continue;
+        }
+        seqs.emplace_back(seq);
+    }
+}
+
+inline std::vector<PoseData> load_7scenes_poses(const string base_path, const string scene, bool gettraining, bool gettest) {
+    cout << "load 7scenes poses" << endl;
+    // fs::path base_path_str(base_path);
+    string trainingset("TrainSplit.txt"), testset("TestSplit.txt");
+    int frame_number;
+    if (scene.compare("stairs") == 0) {
+        frame_number = 500;
+    } else {
+        frame_number = 1000;
+    }
+
+    string training_fn = base_path + '/' + trainingset;
+    string test_fn = base_path + '/' + testset;
+    vector<string> seqs;
+    std::vector<PoseData> pose_data;
+
+    if (gettraining) {
+        load_sequences(training_fn.c_str(), seqs);
+    }
+    if (gettest) {
+        load_sequences(test_fn.c_str(), seqs);
+    }
+
+    /*
+        The matrix stored in file is camera-to-world.
+        We need world-to-camera.
+    */
+    stringstream s;
+    s.fill('0');
+    for (auto& seq : seqs) {
+        for (int idx = 0; idx < frame_number; idx++) {
+            // fs::path seq_str(seq);
+            PoseData pose;
+            s.str("");
+            s << "frame-" << setw(6) << idx << ".pose.txt";
+            pose.filename = seq + "/" + s.str();
+            // auto fn = (base_path_str / seq_str / s.str()).string();
+            auto fn = base_path + "/" + seq + "/" + s.str();
+            // cout << "filename = " << fn << endl;
+            ifstream in(fn);
+
+            Eigen::Matrix4f e;
+            for (int r = 0; r < 4; r++) {
+                for (int c = 0; c < 4; c++) {
+                    in >> e(r, c);
+                    // cout << e(r, c) << ' ';
+                }
+            }
+            // pose.p = e.block<3, 1>(0, 3) - Eigen::Vector3f(0.0245, 0, 0);
+            pose.p = e.block<3, 1>(0, 3);
+            // pose.p = pose.p + Eigen::Vector3f(0.0245, 0, 0);
+            // pose.p = pose.p + e.block<3, 3>(0, 0) * (e.block<3, 3>(0, 0) * Eigen::Vector3f(0.0245, 0, 0));
+            // pose.p = pose.p + e.block<3, 3>(0, 0) * (e.block<3, 3>(0, 0) * Eigen::Vector3f(0.0245, 0, 0));
+            pose.p = pose.p + Eigen::Vector3f(0.0245, 0, 0);
+            Eigen::Quaternionf q(e.block<3, 3>(0, 0));
+            pose.q = q;
+            // e.block<3, 1>(0, 3) = e.block<3, 1>(0, 3) - e.block<3, 3>(0, 0).inverse() * Eigen::Vector3f(0.0245, 0, 0);
+            // q.normalize();
+            // pose.q = q.conjugate();
+            // pose.p = (pose.q * e.block<3, 1>(0, 3));
+            // cout << pose.p(0) << ' ' << pose.p(1) << pose.p(2) << ' ' << endl;
+            // Eigen::Quaternionf q(e.block<3, 3>(0, 0));
+            // q.normalize();
+            // e.block(0, 0, 3, 3) = q.conjugate().toRotationMatrix();
+            // e.block(0, 3, 3, 1) = - (q.conjugate() * e.block(0, 3, 3, 1));
+            // e.block(0, 0, 3, 3) = e.block(0, 0, 3, 3).inverse();
+            // e.block(0, 0, 3, 3) = e.block(0, 0, 3, 3).transpose();
+            // e.block(0, 3, 3, 1) = - (e.block(0, 0, 3, 3) * e.block(0, 3, 3, 1));
+            // pose.p = 
+            // es.emplace_back(e);
+            pose_data.push_back(pose);
+        }
+    }
+
+    return pose_data;
+}
 
 inline std::vector<PoseData> load_cambridge_pose_txt(const std::string &filename, std::map<std::string, float> &focal_map)
 {
@@ -66,32 +158,6 @@ inline std::vector<PoseData> load_cambridge_pose_txt(const std::string &filename
             cout << filename_buffer << " " << pose.p << endl;
             pose_data.push_back(pose);
         }
-        // for (int i = 0; i < 1005; i++)
-        // {
-        //     char filename[256];
-        //     sprintf(filename, "/home/zhouhan/data/code/computer-vision/visual-localization/gl_render/sense_pose/frame-%06d.txt", i);
-        //     cout << filename << endl;
-        //     ifstream pose_file(filename);
-        //     double rt[3][4];
-
-        //     pose_file >> rt[0][0] >> rt[0][1] >> rt[0][2] >> rt[0][3] >> rt[1][0] >> rt[1][1] >> rt[1][2] >> rt[1][3] >> rt[2][0] >> rt[2][1] >> rt[2][2] >> rt[2][3];
-
-        //     Eigen::Matrix3f rotation_matrix;
-        //     rotation_matrix << rt[0][0], rt[0][1], rt[0][2],
-        //         rt[1][0], rt[1][1], rt[1][2],
-        //         rt[2][0], rt[2][1], rt[2][2];
-
-        //     cout << rotation_matrix << endl;
-        //     Eigen::Quaternionf rotation_q(rotation_matrix);
-        //     PoseData pose;
-        //     pose.q = rotation_q;
-        //     pose.p.x() = rt[0][3];
-        //     pose.p.y() = rt[1][3];
-        //     pose.p.z() = rt[2][3];
-        //     cout << rotation_matrix << endl;
-        //     pose_data.push_back(pose);
-        // }
-        // fclose(file);
     }
     else
     {
@@ -106,18 +172,37 @@ void scene_coordinate_projection(
     const std::string &obj_path,
     const std::string &base_dir,
     const std::string &out_dir,
-    const std::string &intrinsic_fn)
+    const std::string &intrinsic_fn,
+    const std::string &dataset,
+    const std::string &scene
+    )
 {
 
-    std::map<std::string, float> focal_map;
-    auto poses_twc_train = load_cambridge_pose_txt(base_dir + "/dataset_train.txt", focal_map);
-    auto poses_twc_test = load_cambridge_pose_txt(base_dir + "/dataset_test.txt", focal_map);
+    // std::map<std::string, float> focal_map;
+    // auto poses_twc_train = load_cambridge_pose_txt(base_dir + "/dataset_train.txt", focal_map);
+    // auto poses_twc_test = load_cambridge_pose_txt(base_dir + "/dataset_test.txt", focal_map);
 
-    std::vector<PoseData> poses_twc_all = poses_twc_train;
-    poses_twc_all.insert(poses_twc_all.end(), poses_twc_test.begin(), poses_twc_test.end());
+    // std::vector<PoseData> poses_twc_all = poses_twc_train;
+    // poses_twc_all.insert(poses_twc_all.end(), poses_twc_test.begin(), poses_twc_test.end());
+
+    cout << "dataset: " << dataset << endl;
+    process_cambridge = dataset.compare("cambridge") == 0;
+    cout << "process cambridge dataset: " << process_cambridge << endl;
+
+    std::vector<PoseData> poses_twc_all;
+    if (process_cambridge) {
+        std::map<std::string, float> focal_map;
+        auto poses_twc_train = load_cambridge_pose_txt(base_dir + "/dataset_train.txt", focal_map);
+        auto poses_twc_test = load_cambridge_pose_txt(base_dir + "/dataset_test.txt", focal_map);
+
+        poses_twc_all = poses_twc_train;
+        poses_twc_all.insert(poses_twc_all.end(), poses_twc_test.begin(), poses_twc_test.end());
+    } else {
+        poses_twc_all = load_7scenes_poses(base_dir, scene, true, true);
+    }
 
 
-    cout << poses_twc_all.size() << endl;
+    cout << "pose size:" << poses_twc_all.size() << endl;
 
     Eigen::Matrix3f intrinsics;
     ifstream intrinsic_if(intrinsic_fn);
@@ -146,16 +231,19 @@ void scene_coordinate_projection(
     int cnt = 0;
     for (auto &pose : poses_twc_all)
     {
-        // sprintf(buffer, "frame-%06d.txt", cnt);
-        // filename = buffer;
-        // std::string input_pose_fn = base_dir + filename;
-        // sprintf(buffer, "frame-%06d.png", cnt++);
-        // filename = buffer;
-        // std::string output_vis_fn = out_dir + filename;
-        // std::string output_bin_fn = out_dir + filename.replace(filename.end() - 3, filename.end(), "bin");
         std::string output_vis_fn = out_dir + pose.filename;
-        std::string input_pose_fn = base_dir + pose.filename.replace(pose.filename.end() - 3, pose.filename.end(), "txt");
-        std::string output_bin_fn = out_dir + pose.filename.replace(pose.filename.end() - 3, pose.filename.end(), "bin");
+        std::string input_pose_fn = base_dir + pose.filename;
+        std::string output_bin_fn = out_dir + pose.filename;
+
+        if (process_cambridge) {
+            input_pose_fn = input_pose_fn.replace(input_pose_fn.end() - 3, input_pose_fn.end(), "txt");
+            output_bin_fn = output_bin_fn.replace(output_bin_fn.end() - 3, output_bin_fn.end(), "bin");
+        }
+        else{
+            input_pose_fn = input_pose_fn.replace(input_pose_fn.end() - 8, input_pose_fn.end(), "txt");
+            output_bin_fn = output_bin_fn.replace(output_bin_fn.end() - 8, output_bin_fn.end(), "bin");
+            output_vis_fn.replace(output_vis_fn.end() - 8, output_vis_fn.end(), "sc.png");
+        }
 
         cout << "input pose fn = " << input_pose_fn << endl;
         cout << "pose file name = " << pose.filename << endl;
@@ -187,6 +275,7 @@ void scene_coordinate_projection(
         }
         cout << "max, min: " << max_buffer << " " << min_buffer << endl;
         cv::flip(img, img, 0);
+        cout << output_vis_fn << endl;
         cv::imwrite(output_vis_fn, img);
 
         delete xyz_buffer;

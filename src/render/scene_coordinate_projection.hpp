@@ -14,7 +14,9 @@ void scene_coordinate_projection(
     const std::string &obj_path,
     const std::string &base_dir, 
     const std::string &out_dir,
-    const std::string &intrinsic_fn
+    const std::string &intrinsic_fn,
+    const std::string &dataset,
+    const std::string &scene
 );
 
 #endif
