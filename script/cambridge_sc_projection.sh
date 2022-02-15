@@ -13,21 +13,21 @@ mkdir -p ../out/KingsCollege/seq8
 ../out/KingsCollege/ \
 cambridge_intrinsics.txt
 
-mkdir -p ../out/OldHospital/seq1
-mkdir -p ../out/OldHospital/seq2
-mkdir -p ../out/OldHospital/seq3
-mkdir -p ../out/OldHospital/seq4
-mkdir -p ../out/OldHospital/seq5
-mkdir -p ../out/OldHospital/seq6
-mkdir -p ../out/OldHospital/seq7
-mkdir -p ../out/OldHospital/seq8
-mkdir -p ../out/OldHospital/seq9
+# mkdir -p ../out/OldHospital/seq1
+# mkdir -p ../out/OldHospital/seq2
+# mkdir -p ../out/OldHospital/seq3
+# mkdir -p ../out/OldHospital/seq4
+# mkdir -p ../out/OldHospital/seq5
+# mkdir -p ../out/OldHospital/seq6
+# mkdir -p ../out/OldHospital/seq7
+# mkdir -p ../out/OldHospital/seq8
+# mkdir -p ../out/OldHospital/seq9
 
-../bin/render ../src/render 8.1.g_buffer.scene_coordinate \
-../data/cambridge_data/OldHospital/OldHospital.obj \
-../data/cambridge_data/OldHospital/ \
-../out/OldHospital/ \
-cambridge_intrinsics.txt
+# ../bin/render ../src/render 8.1.g_buffer.scene_coordinate \
+# ../data/cambridge_data/OldHospital/OldHospital.obj \
+# ../data/cambridge_data/OldHospital/ \
+# ../out/OldHospital/ \
+# cambridge_intrinsics.txt
 
 #  mkdir -p ../out/ShopFacade/seq1
 #  mkdir -p ../out/ShopFacade/seq2
@@ -40,17 +40,17 @@ cambridge_intrinsics.txt
 #  cambridge_intrinsics.txt
 
 
-mkdir -p ../out/GreatCourt/seq1
-mkdir -p ../out/GreatCourt/seq2
-mkdir -p ../out/GreatCourt/seq3
-mkdir -p ../out/GreatCourt/seq4
-mkdir -p ../out/GreatCourt/seq5
+# mkdir -p ../out/GreatCourt/seq1
+# mkdir -p ../out/GreatCourt/seq2
+# mkdir -p ../out/GreatCourt/seq3
+# mkdir -p ../out/GreatCourt/seq4
+# mkdir -p ../out/GreatCourt/seq5
 
-../bin/render ../src/render 8.1.g_buffer.scene_coordinate \
-../data/cambridge_data/GreatCourt/GreatCourt.obj \
-../data/cambridge_data/GreatCourt/ \
-../out/GreatCourt/ \
-cambridge_intrinsics.txt
+# ../bin/render ../src/render 8.1.g_buffer.scene_coordinate \
+# ../data/cambridge_data/GreatCourt/GreatCourt.obj \
+# ../data/cambridge_data/GreatCourt/ \
+# ../out/GreatCourt/ \
+# cambridge_intrinsics.txt
 
 
 # mkdir -p ../out/StMarysChurch/seq1
