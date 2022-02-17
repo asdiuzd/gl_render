@@ -24,14 +24,26 @@
 GLFWwindow *window;
 
 // settings
-//const unsigned int SCR_WIDTH = 852;
-//const unsigned int SCR_HEIGHT = 480;
+
+/////////////////////////////////////////////////
+// 7scenes 
+const float norm_min = -1,
+                norm_max = 1;
 
 const unsigned int SCR_WIDTH = 640;
 const unsigned int SCR_HEIGHT = 480;
+/////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////
+// cambridge
+// const float norm_min = -100,
+//                 norm_max = 100;
 
 // const unsigned int SCR_WIDTH = 1920 / 2;
 // const unsigned int SCR_HEIGHT = 1080 / 2;
+
+/////////////////////////////////////////////////
 
 const float near = 0.01;
 const float far = 1000;

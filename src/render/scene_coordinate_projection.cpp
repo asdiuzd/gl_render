@@ -26,6 +26,8 @@
 
 #include "scene_coordinate_projection.hpp"
 
+extern const float norm_min, norm_max;
+
 bool process_cambridge = false;
 
 struct PoseData
@@ -222,8 +224,7 @@ void scene_coordinate_projection(
     cout << "---------" << endl;
     cout << intrinsics << endl;
 
-    const float norm_min = -100,
-                norm_max = 100;
+    
 
     Renderer renderer(shader_path.c_str(), shader_name.c_str(), obj_path.c_str());
     std::string filename;

@@ -26,6 +26,8 @@
 extern const unsigned int SCR_WIDTH;
 extern const unsigned int SCR_HEIGHT;
 
+extern const float norm_min, norm_max;
+
 class Renderer {
 public:
     Renderer(const std::string shader_path, const std::string shader_name, const std::string obj_path);

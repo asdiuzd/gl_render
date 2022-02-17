@@ -13,7 +13,7 @@ link_directories(${CMAKE_SOURCE_DIR}/lib)
 
 # list(APPEND CMAKE_CXX_FLAGS "-std=c++11")
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # find the required packages
@@ -38,7 +38,7 @@ add_definitions(${OPENGL_DEFINITIONS})
 find_package(X11 REQUIRED)
 # note that the order is important for setting the libs
 # use pkg-config --libs $(pkg-config --print-requires --print-requires-private glfw3) in a terminal to confirm
-set(LIBS glfw X11 Xrandr Xinerama Xi Xxf86vm Xcursor GL dl pthread assimp)
+set(LIBS glfw stdc++fs X11 Xrandr Xinerama Xi Xxf86vm Xcursor GL dl pthread assimp)
 set (CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -ldl")
 
 

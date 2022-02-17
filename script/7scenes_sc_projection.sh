@@ -99,3 +99,6 @@ chess
 # ~/data/SceneCoordinates/7scenes/stairs/ \
 # 7scenes_intrinsics.txt \
 # stairs
+
+
+cp -r ~/data/segmentations/7scenes/* ~/data/7scenes_release
